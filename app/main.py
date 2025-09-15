@@ -1,9 +1,20 @@
 from fastapi import FastAPI, Request
 import json
 import os
+from typing import List
 
 app = FastAPI()
 
+def leer_notas() -> List[str]:
+    try:
+        with open("data/notas.txt", "r", encoding="utf-8") as f:
+            return f.read().splitlines()
+    except FileNotFoundError:
+        return []
+
+def guardar_nota(contenido: str):
+    with open("data/notas.txt", "a", encoding="utf-8") as f:
+        f.write(contenido + "\n")
 
 @app.get("/")
 async def root():
@@ -17,10 +28,10 @@ async def root():
 async def get_notes():
 
     # TODO: Implementar
-    return {"notes": []}
+    return {"notes": leer_notas()}
 
 
 @app.post("/notes")
-async def create_note(request: Request):
-    # TODO: Implementar
-    return {"message": "Note created successfully!"}
+async def create_note(contenido: str):
+    guardar_nota(contenido)
+    return {"message": "Note created successfully!", "note": contenido}
